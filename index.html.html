@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calorie Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #container {
+            margin: 20px;
+        }
+
+        select, input, button {
+            margin: 5px;
+        }
+
+        .selected-item {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .remove-button {
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calorie Calculator</h1>
+
+    <div id="container">
+        <label for="foodDropdown">Select Food:</label>
+        <input type="text" id="foodSearch" placeholder="Search for Food">
+        <select id="foodDropdown">
+            <option value="0">-- Select Food --</option>
+        </select>
+
+        <div id="customItemSection">
+            <label for="customItem">Custom Item:</label>
+            <input type="text" id="customItem" placeholder="Item Name">
+            <input type="number" id="customCalories" placeholder="Calories">
+            <button id="addCustomItem">Add Custom Item</button>
+        </div>
+
+        <button id="addFood">Add Food</button>
+
+        <div id="selectedFoods">
+            <h2>Selected Foods</h2>
+            <!-- Selected foods will be displayed here -->
+        </div>
+
+        <button id="calculateTotal">Calculate Total</button>
+
+        <div id="totalCalories">
+            <!-- Total calories will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        const foodData = {
+            0: { name: "-- Select Food --", calories: 0 },
+            1: { name: "1 apple", calories: 52 },
+            2: { name: "1 Cucumber", calories: 16 },
+            3: { name: "1 banana", calories: 105 },
+            4: { name: "1 rice cake", calories: 35 },
+            5: { name: "1 brown toast", calories: 74 },
+            6: { name: "1 tortilla", calories: 104 },
+            7: { name: "100 grams of cooked grilled chicken breasts", calories: 165 },
+            8: { name: "150 grams of cooked grilled chicken breasts", calories: 248 },
+            9: { name: "200 grams of cooked grilled chicken breasts", calories: 330 },
+            10: { name: "250 grams of cooked grilled chicken breasts", calories: 413 },
+            11: { name: "100 grams of cooked lean meat", calories: 143 },
+            12: { name: "150 grams of cooked lean meat", calories: 214 },
+            13: { name: "200 grams of cooked lean meat", calories: 286 },
+            14: { name: "250 grams of cooked lean meat", calories: 358 },
+            15: { name: "100 grams of cooked tilapia fish", calories: 96 },
+            16: { name: "150 grams of cooked tilapia fish", calories: 144 },
+            17: { name: "200 grams of cooked tilapia fish", calories: 192 },
+            18: { name: "250 grams of cooked tilapia fish", calories: 240 },
+            19: { name: "100 grams of potatoes", calories: 87 },
+            20: { name: "150 grams of potatoes", calories: 131 },
+            21: { name: "200 grams of potatoes", calories: 174 },
+            22: { name: "100 grams of cooked rice", calories: 130 },
+            23: { name: "150 grams of cooked rice", calories: 195 },
+            24: { name: "200 grams of cooked rice", calories: 260 },
+            25: { name: "100 grams of cottage cheese", calories: 98 },
+            26: { name: "150 grams of cottage cheese", calories: 147 },
+            27: { name: "50 grams of arugula", calories: 4 },
+            28: { name: "50 grams of green beans", calories: 8 },
+            29: { name: "50 grams of broccoli", calories: 13 },
+            30: { name: "100 grams of broccoli", calories: 34 },
+            31: { name: "15 grams of almonds", calories: 85 },
+            32: { name: "30 grams of almonds", calories: 170 },
+            33: { name: "1 can of tuna", calories: 179 },
+            34: { name: "1 pack of fat-free Greek yogurt", calories: 100 },
+            35: { name: "1 whole egg", calories: 68 },
+            36: { name: "2 whole eggs", calories: 136 },
+            37: { name: "3 whole eggs", calories: 204 },
+            38: { name: "1 egg white", calories: 17 },
+            39: { name: "1 tbsp of peanut butter", calories: 94 },
+            40: { name: "1 tbsp of honey", calories: 64 },
+            41: { name: "1 tsp  of honey", calories: 21 },
+            42: { name: "50 grams of sweet corn", calories: 43 },
+        };
+
+        const selectedFoods = [];
+
+        function renderDropdownList() {
+            const foodDropdown = document.getElementById("foodDropdown");
+            for (const foodId in foodData) {
+                const option = document.createElement("option");
+                option.value = foodId;
+                option.textContent = `${foodData[foodId].name} - ${foodData[foodId].calories} calories`;
+                foodDropdown.appendChild(option);
+            }
+        }
+
+        function renderSelectedFoods() {
+            const selectedFoodsDiv = document.getElementById("selectedFoods");
+            selectedFoodsDiv.innerHTML = "<h2>Selected Foods</h2>";
+
+            selectedFoods.forEach(foodId => {
+                const selectedFoodName = document.createElement("div");
+                selectedFoodName.className = "selected-item";
+                selectedFoodName.innerHTML = `
+                    <span>${foodData[foodId].name}</span>
+                    <button class="remove-button" data-food-id="${foodId}">Remove</button>
+                `;
+                selectedFoodsDiv.appendChild(selectedFoodName);
+            });
+        }
+
+        function removeFood(foodId) {
+            const index = selectedFoods.indexOf(foodId);
+            if (index > -1) {
+                selectedFoods.splice(index, 1);
+                renderSelectedFoods();
+            }
+        }
+
+        document.getElementById("addFood").addEventListener("click", function () {
+            const foodDropdown = document.getElementById("foodDropdown");
+            const selectedFoodId = foodDropdown.value;
+            if (selectedFoodId !== "0") {
+                selectedFoods.push(selectedFoodId);
+                renderSelectedFoods();
+            }
+        });
+
+        document.getElementById("addCustomItem").addEventListener("click", function () {
+            const customItemName = document.getElementById("customItem").value;
+            const customCalories = parseInt(document.getElementById("customCalories").value);
+            
+            if (customItemName && !isNaN(customCalories) && customCalories > 0) {
+                const customFoodId = Object.keys(foodData).length.toString();
+                foodData[customFoodId] = { name: customItemName, calories: customCalories };
+                const foodDropdown = document.getElementById("foodDropdown");
+                const option = new Option(`${customItemName} - ${customCalories} calories`, customFoodId);
+                foodDropdown.options[foodDropdown.options.length] = option;
+                selectedFoods.push(customFoodId);
+                renderSelectedFoods();
+            }
+        });
+
+        document.getElementById("calculateTotal").addEventListener("click", function () {
+            const totalCalories = selectedFoods.reduce((total, foodId) => total + foodData[foodId].calories, 0);
+            document.getElementById("totalCalories").textContent = "Total Calories: " + totalCalories;
+        });
+
+        document.getElementById("foodSearch").addEventListener("input", function () {
+            const keyword = this.value.trim().toLowerCase();
+            const foodDropdown = document.getElementById("foodDropdown");
+
+            for (let i = 1; i < foodDropdown.options.length; i++) {
+                const optionText = foodData[foodDropdown.options[i].value].name.toLowerCase();
+                const option = foodDropdown.options[i];
+
+                if (keyword === "" || optionText.includes(keyword)) {
+                    option.style.display = "block";
+                } else {
+                    option.style.display = "none";
+                }
+            }
+        });
+
+        // Use event delegation to handle remove button clicks
+        document.getElementById("selectedFoods").addEventListener("click", function (event) {
+            if (event.target.classList.contains("remove-button")) {
+                const foodId = event.target.getAttribute("data-food-id");
+                removeFood(foodId);
+            }
+        });
+
+        renderDropdownList();
+    </script>
+</body>
+</html>
